@@ -113,6 +113,7 @@ JLI_TraceLauncher(const char* fmt, ...)
 JNIEXPORT void JNICALL
 JLI_SetTraceLauncher()
 {
+    // 设置log日志等级 通过 环境变量
    if (getenv(JLDEBUG_ENV_ENTRY) != 0) {
         _launcher_debug = JNI_TRUE;
         JLI_TraceLauncher("----%s----\n", JLDEBUG_ENV_ENTRY);

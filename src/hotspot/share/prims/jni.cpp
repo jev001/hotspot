@@ -3716,6 +3716,7 @@ DT_RETURN_MARK_DECL(CreateJavaVM, jint
                     , HOTSPOT_JNI_CREATEJAVAVM_RETURN(_ret_ref));
 
 static jint JNI_CreateJavaVM_inner(JavaVM **vm, void **penv, void *args) {
+    // hotspot 创建JVM 入口
   HOTSPOT_JNI_CREATEJAVAVM_ENTRY((void **) vm, penv, args);
 
   jint result = JNI_ERR;
@@ -3773,6 +3774,7 @@ static jint JNI_CreateJavaVM_inner(JavaVM **vm, void **penv, void *args) {
    */
   bool can_try_again = true;
 
+    // 线程执行创建JVM 的方法？？？这是啥情况？
   result = Threads::create_vm((JavaVMInitArgs*) args, &can_try_again);
   if (result == JNI_OK) {
     JavaThread *thread = JavaThread::current();
@@ -3850,12 +3852,14 @@ static jint JNI_CreateJavaVM_inner(JavaVM **vm, void **penv, void *args) {
 
 }
 
+// JNI函数指针. 
 _JNI_IMPORT_OR_EXPORT_ jint JNICALL JNI_CreateJavaVM(JavaVM **vm, void **penv, void *args) {
   jint result = JNI_ERR;
   // On Windows, let CreateJavaVM run with SEH protection
 #ifdef _WIN32
   __try {
 #endif
+// 创建jnijvm
     result = JNI_CreateJavaVM_inner(vm, penv, args);
 #ifdef _WIN32
   } __except(topLevelExceptionFilter((_EXCEPTION_POINTERS*)_exception_info())) {

@@ -606,6 +606,7 @@ LoadJavaVM(const char *jvmpath, InvocationFunctions *ifn)
         return JNI_FALSE;
     }
 
+    // 获取创建Jvm的函数地址,函数指针 用这个方式可以获取到 libJvm 中的创建JVM 的函数
     ifn->CreateJavaVM = (CreateJavaVM_t)
         dlsym(libjvm, "JNI_CreateJavaVM");
     if (ifn->CreateJavaVM == NULL) {
@@ -728,6 +729,7 @@ void* SplashProcAddress(const char* name) {
 }
 
 /*
+ * 创建一个新的线程然后再执行一次JavaM
  * Signature adapter for pthread_create() or thr_create().
  */
 static void* ThreadJavaMain(void* args) {
@@ -735,6 +737,7 @@ static void* ThreadJavaMain(void* args) {
 }
 
 /*
+阻塞创建主线程
  * Block current thread and continue execution in a new thread.
  */
 int
@@ -746,13 +749,17 @@ CallJavaMainInNewThread(jlong stack_size, void* args) {
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+    //如果当前线程堆大于0那么附加数据到
     if (stack_size > 0) {
         pthread_attr_setstacksize(&attr, stack_size);
     }
     pthread_attr_setguardsize(&attr, 0); // no pthread guard page on java threads
 
+    // 创建主线程的操作线程的方法. 创建成功后会直接调用 ThreadJavaMain 方法 
     if (pthread_create(&tid, &attr, ThreadJavaMain, args) == 0) {
+        // 如果创建失败 那么直接返回创建结果
         void* tmp;
+        // 暂停当前线程----->直到ThreadJavaMain线程执行结束-----> 也就是 Java所有功能执行完毕需要被回收的时候
         pthread_join(tid, &tmp);
         rslt = (int)(intptr_t)tmp;
     } else {
@@ -762,9 +769,11 @@ CallJavaMainInNewThread(jlong stack_size, void* args) {
         * later in JavaMain as JNI_CreateJavaVM needs to create quite a
         * few new threads, anyway, just give it a try..
         */
+       // 创建成功后. 将对JavaMain进行操作
         rslt = JavaMain(args);
     }
-
+    // linux 是直接销毁了???? mac是一直循环 阻塞主线程
+    // 线程执行结束后的销毁操作
     pthread_attr_destroy(&attr);
 #else /* __solaris__ */
     thread_t tid;
@@ -789,7 +798,9 @@ JVMInit(InvocationFunctions* ifn, jlong threadStackSize,
         int argc, char **argv,
         int mode, char *what, int ret)
 {
+    // 
     ShowSplashScreen();
+    // 继续创建一个主线程
     return ContinueInNewThread(ifn, threadStackSize, argc, argv, mode, what, ret);
 }
 
@@ -817,6 +828,7 @@ ProcessPlatformOption(const char *arg)
 #ifndef __solaris__
 
 /*
+  获取当前逻辑时钟
  * Provide a CounterGet() implementation based on gettimeofday() which
  * is universally available, even though it may not be 'high resolution'
  * compared to platforms that provide gethrtime() (like Solaris). It is

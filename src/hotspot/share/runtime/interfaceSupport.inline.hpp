@@ -205,6 +205,7 @@ class ThreadInVMfromUnknown {
 };
 
 
+// 线程状态迁移器
 class ThreadInVMfromNative : public ThreadStateTransition {
  public:
   ThreadInVMfromNative(JavaThread* thread) : ThreadStateTransition(thread) {
@@ -475,6 +476,8 @@ extern "C" {                                                         \
 
 
 // Definitions for JVM
+// 超级厉害的内联函数. 通过标记, 可以对当前线程信息进行标注
+// 这个地方也就是传说这的check_point? 里面标记了当前线程环境下的信息. 比如进入这个线程会objectMonitor 一下
 
 #define JVM_ENTRY(result_type, header)                               \
 extern "C" {                                                         \

@@ -1175,6 +1175,7 @@ JVM_ENTRY(jclass, JVM_DefineClassWithSource(JNIEnv *env, const char *name, jobje
 JVM_END
 
 JVM_ENTRY(jclass, JVM_FindLoadedClass(JNIEnv *env, jobject loader, jstring name))
+    // 类资源标记 这个资源被线程加载了
   JVMWrapper("JVM_FindLoadedClass");
   ResourceMark rm(THREAD);
 

@@ -165,11 +165,13 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
     char** argv = *pargv;
 
     /* Find out where the JRE is that we will be using. */
+    // java运行环境是否存在
     if (!GetJREPath(jrepath, so_jrepath)) {
         JLI_ReportErrorMessage(JRE_ERROR1);
         exit(2);
     }
 
+    // 为什呢需要 jvm.cfd
     JLI_Snprintf(jvmcfg, so_jvmcfg, "%s%slib%sjvm.cfg",
         jrepath, FILESEP, FILESEP);
 
@@ -178,7 +180,7 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
         JLI_ReportErrorMessage(CFG_ERROR7);
         exit(1);
     }
-
+    // 确认虚拟机类型
     jvmtype = CheckJvmType(pargc, pargv, JNI_FALSE);
     if (JLI_StrCmp(jvmtype, "ERROR") == 0) {
         JLI_ReportErrorMessage(CFG_ERROR9);
@@ -391,6 +393,7 @@ LoadJavaVM(const char *jvmpath, InvocationFunctions *ifn)
     }
 
     /* Now get the function addresses */
+    // 创建Jvm 的方法地址. 这个是C 的函数指针
     ifn->CreateJavaVM =
         (void *)GetProcAddress(handle, "JNI_CreateJavaVM");
     ifn->GetDefaultJavaVMInitArgs =

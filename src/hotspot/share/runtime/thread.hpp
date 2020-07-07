@@ -144,6 +144,7 @@ class Thread: public ThreadShadow {
 
 #ifndef USE_LIBRARY_BASED_TLS_ONLY
   // Current thread is maintained as a thread-local variable
+  // 线程本地变量
   static THREAD_LOCAL Thread* _thr_current;
 #endif
 
@@ -1826,6 +1827,7 @@ class JavaThread: public Thread {
     JavaThread *thread_from_jni_env = (JavaThread*)((intptr_t)env - in_bytes(jni_environment_offset()));
     // Only return NULL if thread is off the thread list; starting to
     // exit should not return NULL.
+    // 如果检测到当前线程执行的环境中 is_terminated 为true 表示java代码中要将线程终端
     if (thread_from_jni_env->is_terminated()) {
       thread_from_jni_env->block_if_vm_exited();
       return NULL;

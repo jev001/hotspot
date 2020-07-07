@@ -74,6 +74,7 @@
 #define JDK_JAVA_OPTIONS "JDK_JAVA_OPTIONS"
 
 /*
+* JNI 动态链接库函数
  * Pointers to the needed JNI invocation API, initialized by LoadJavaVM.
  */
 typedef jint (JNICALL *CreateJavaVM_t)(JavaVM **pvm, void **env, void *args);
@@ -156,6 +157,7 @@ JLI_ReportExceptionDescription(JNIEnv * env);
 void PrintMachineDependentOptions();
 
 /*
+ * 阻塞当前线程,在新的线程中执行下一步的资源
  * Block current thread and continue execution in new thread.
  */
 int CallJavaMainInNewThread(jlong stack_size, void* args);

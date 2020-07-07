@@ -176,6 +176,7 @@ void* Thread::allocate(size_t size, bool throw_excpt, MEMFLAGS flags) {
   if (UseBiasedLocking) {
     const size_t alignment = markWord::biased_lock_alignment;
     size_t aligned_size = size + (alignment - sizeof(intptr_t));
+    // 在Heap中分配地址
     void* real_malloc_addr = throw_excpt? AllocateHeap(aligned_size, flags, CURRENT_PC)
                                           : AllocateHeap(aligned_size, flags, CURRENT_PC,
                                                          AllocFailStrategy::RETURN_NULL);
@@ -3738,6 +3739,7 @@ void Threads::initialize_jsr292_core_classes(TRAPS) {
   initialize_class(vmSymbols::java_lang_invoke_MethodHandleNatives(), CHECK);
 }
 
+// java 创建线程的方法
 jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   extern void JDK_Version_init();
 
@@ -3748,15 +3750,18 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   if (!is_supported_jni_version(args->version)) return JNI_EVERSION;
 
   // Initialize library-based TLS
+  // 线程本地变量初始化
   ThreadLocalStorage::init();
 
   // Initialize the output stream module
+  // 流模块初始换
   ostream_init();
 
   // Process java launcher properties.
   Arguments::process_sun_java_launcher_properties(args);
 
   // Initialize the os module
+  // 系统初始化
   os::init();
 
   // Record VM creation timing statistics
@@ -3816,6 +3821,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   }
 #endif // CAN_SHOW_REGISTERS_ON_ASSERT
 
+// 第一次出现 safepointMachineIsa
   SafepointMechanism::initialize();
 
   jint adjust_after_os_result = Arguments::adjust_after_os();

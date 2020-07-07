@@ -93,6 +93,8 @@ WinMain(HINSTANCE inst, HINSTANCE previnst, LPSTR cmdline, int cmdshow)
     __initenv = _environ;
 
 #else /* JAVAW */
+
+// Java 启动路口
 JNIEXPORT int
 main(int argc, char **argv)
 {
@@ -110,10 +112,12 @@ main(int argc, char **argv)
             ? sizeof(const_jargs) / sizeof(char *)
             : 0; // ignore the null terminator index
 
+        // 启动参数 分配
         extra_jargc = (sizeof(const_extra_jargs) / sizeof(char *)) > 1
             ? sizeof(const_extra_jargs) / sizeof(char *)
             : 0; // ignore the null terminator index
 
+        // 如果存在启动参数
         if (main_jargc > 0 && extra_jargc > 0) { // combine extra java args
             jargc = main_jargc + extra_jargc;
             list = JLI_List_new(jargc + 1);
@@ -203,6 +207,7 @@ main(int argc, char **argv)
         margv = args->elements;
     }
 #endif /* WIN32 */
+    // 启动Java launch 接口
     return JLI_Launch(margc, margv,
                    jargc, (const char**) jargv,
                    0, NULL,

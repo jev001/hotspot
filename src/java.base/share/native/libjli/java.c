@@ -205,6 +205,7 @@ static jboolean IsWildCardEnabled();
  * Running Java code in primordial thread caused many problems. We will
  * create a new thread to invoke JVM. See 6316197 for more information.
  */
+// 当前的全局线程堆栈大小
 static jlong threadStackSize    = 0;  /* stack size of the new thread */
 static jlong maxHeapSize        = 0;  /* max heap size */
 static jlong initialHeapSize    = 0;  /* initial heap size */
@@ -220,7 +221,7 @@ static jlong initialHeapSize    = 0;  /* initial heap size */
 #endif
 
 /*
- * Entry point.
+ * Entry point. 启动点
  */
 JNIEXPORT int JNICALL
 JLI_Launch(int argc, char ** argv,              /* main argc, argv */
@@ -238,8 +239,10 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
 {
     int mode = LM_UNKNOWN;
     char *what = NULL;
+    // 运行的主class 名称
     char *main_class = NULL;
     int ret;
+    // 
     InvocationFunctions ifn;
     jlong start = 0, end = 0;
     char jvmpath[MAXPATHLEN];
@@ -252,7 +255,9 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
     _is_java_args = javaargs;
     _wc_enabled = cpwildcard;
 
+    // 初始化启动器javaw
     InitLauncher(javaw);
+    // 打印当前启动环境状态信息
     DumpState();
     if (JLI_IsTraceLauncher()) {
         int i;
@@ -272,6 +277,7 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
      *
      *  1) Disallow specification of another JRE.  With 1.9, another
      *     version of the JRE cannot be invoked.
+     * // 1.9之后使用jdk 1.9之前使用jre 
      *  2) Allow for a JRE version to invoke JDK 1.9 or later.  Since
      *     all mJRE directives have been stripped from the request but
      *     the pre 1.9 JRE [ 1.6 thru 1.8 ], it is as if 1.9+ has been
@@ -279,11 +285,13 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
      */
     SelectVersion(argc, argv, &main_class);
 
+    // 创建执行的环境信息
+    // 会获取到JVM地址和jre运行地址
     CreateExecutionEnvironment(&argc, &argv,
                                jrepath, sizeof(jrepath),
                                jvmpath, sizeof(jvmpath),
                                jvmcfg,  sizeof(jvmcfg));
-
+    // 是不是存在  传入的参数信息
     if (!IsJavaArgs()) {
         SetJvmEnvironment(argc,argv);
     }
@@ -295,6 +303,7 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
         start = CounterGet();
     }
 
+    // 启动Jvm, LoadJavaVM 目前有两个实现的. 一个是Windows 实现的 java_md 一个是 *unix实现的
     if (!LoadJavaVM(jvmpath, &ifn)) {
         return(6);
     }
@@ -329,7 +338,7 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
     if (!ParseArguments(&argc, &argv, &mode, &what, &ret, jrepath)) {
         return(ret);
     }
-
+    // 如果是使用 -jar 方式运行的需要将jar 的classpath 添加进去
     /* Override class path if -jar flag was specified */
     if (mode == LM_JAR) {
         SetClassPath(what);     /* Override class path */
@@ -341,6 +350,7 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
     /* Set the -Dsun.java.launcher pseudo property */
     SetJavaLauncherProp();
 
+    // 虚拟机初始化操作
     return JVMInit(&ifn, threadStackSize, argc, argv, mode, what, ret);
 }
 /*
@@ -399,6 +409,7 @@ JavaMain(void* _args)
     char **argv = args->argv;
     int mode = args->mode;
     char *what = args->what;
+     // 启动的时候 将ifn初始化了
     InvocationFunctions ifn = args->ifn;
 
     JavaVM *vm = 0;
@@ -410,20 +421,25 @@ JavaMain(void* _args)
     int ret = 0;
     jlong start = 0, end = 0;
 
+    // 注册 线程通知 2020-06-28暂时不知道有啥用处
     RegisterThread();
 
     /* Initialize the virtual machine */
+    // 获取当前逻辑时钟 计时虚拟机启动时间
     start = CounterGet();
+    // 初始化JVM成功
     if (!InitializeJVM(&vm, &env, &ifn)) {
         JLI_ReportErrorMessage(JVM_ERROR1);
         exit(1);
     }
 
+    // 设置?
     if (showSettings != NULL) {
         ShowSettings(env, showSettings);
         CHECK_EXCEPTION_LEAVE(1);
     }
 
+    // 设置?
     // show resolved modules and continue
     if (showResolvedModules) {
         ShowResolvedModules(env);
@@ -508,6 +524,7 @@ JavaMain(void* _args)
      * This method also correctly handles launching existing JavaFX
      * applications that may or may not have a Main-Class manifest entry.
      */
+    // 重点加载 主Class 文件信息
     mainClass = LoadMainClass(env, mode, what);
     CHECK_EXCEPTION_NULL_LEAVE(mainClass);
     /*
@@ -516,6 +533,7 @@ JavaMain(void* _args)
      * applications own main class but rather a helper class. To keep things
      * consistent in the UI we need to track and report the application main class.
      */
+    // 获取启动Class信息
     appClass = GetApplicationClass(env);
     NULL_CHECK_RETURN_VALUE(appClass, -1);
 
@@ -535,6 +553,7 @@ JavaMain(void* _args)
      * instead of mainClass as that may be a launcher or helper class instead
      * of the application class.
      */
+    // JVM初始化???
     PostJVMInit(env, appClass, vm);
     CHECK_EXCEPTION_LEAVE(1);
 
@@ -544,11 +563,12 @@ JavaMain(void* _args)
      * is not required. The main method is invoked here so that extraneous java
      * stacks are not in the application stack trace.
      */
+    // 获取main方法
     mainID = (*env)->GetStaticMethodID(env, mainClass, "main",
                                        "([Ljava/lang/String;)V");
     CHECK_EXCEPTION_NULL_LEAVE(mainID);
 
-    /* Invoke main method. */
+    /* Invoke main method. */ // 执行java main方法
     (*env)->CallStaticVoidMethod(env, mainClass, mainID, mainArgs);
 
     /*
@@ -1508,6 +1528,7 @@ ParseArguments(int *pargc, char ***pargv,
 }
 
 /*
+// 初始化Java虚拟机
  * Initializes the Java Virtual Machine. Also frees options array when
  * finished.
  */
@@ -1535,7 +1556,9 @@ InitializeJVM(JavaVM **pvm, JNIEnv **penv, InvocationFunctions *ifn)
                    i, args.options[i].optionString);
     }
 
+    // 调用JNI CreateJavaVM JavaVm的方法
     r = ifn->CreateJavaVM(pvm, (void **)penv, &args);
+    // 释放启动之前用到的参数信息内存
     JLI_MemFree(options);
     return r == JNI_OK;
 }
@@ -1572,12 +1595,15 @@ NewPlatformString(JNIEnv *env, char *s)
         (*env)->SetByteArrayRegion(env, ary, 0, len, (jbyte *)s);
         if (!(*env)->ExceptionOccurred(env)) {
             if (makePlatformStringMID == NULL) {
+                // 调用JNI 获取方法
                 NULL_CHECK0(makePlatformStringMID = (*env)->GetStaticMethodID(env,
                         cls, "makePlatformString", "(Z[B)Ljava/lang/String;"));
             }
+            // 获取静态对象 通过静态方法
             str = (*env)->CallStaticObjectMethod(env, cls,
                     makePlatformStringMID, USE_STDERR, ary);
             CHECK_EXCEPTION_RETURN_VALUE(0);
+            // 删除本地应用
             (*env)->DeleteLocalRef(env, ary);
             return str;
         }
@@ -1624,11 +1650,14 @@ LoadMainClass(JNIEnv *env, int mode, char *name)
     if (JLI_IsTraceLauncher()) {
         start = CounterGet();
     }
+    // 获取静态方法编号. 静态方法名称为 checkAndLoadMain 会执行loadClass 加载类文件信息
     NULL_CHECK0(mid = (*env)->GetStaticMethodID(env, cls,
                 "checkAndLoadMain",
                 "(ZILjava/lang/String;)Ljava/lang/Class;"));
 
+    // 获取自定义MainClass 
     NULL_CHECK0(str = NewPlatformString(env, name));
+    // 执行静态方法
     NULL_CHECK0(result = (*env)->CallStaticObjectMethod(env, cls, mid,
                                                         USE_STDERR, mode, str));
 
@@ -2227,6 +2256,7 @@ FreeKnownVMs()
 }
 
 /*
+* 输出一些运行数据, 包含运行路径这些
  * Displays the splash screen according to the jar file name
  * and image file names stored in environment variables
  */
@@ -2332,6 +2362,7 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
                     int argc, char **argv,
                     int mode, char *what, int ret)
 {
+    // 线程状态大小是0 那么分配一个系统配置的数据,第一次进入,线程堆为空, 那么需要创建一个线程？？？？
     if (threadStackSize == 0) {
         /*
          * If the user hasn't specified a non-zero stack size ask the JVM for its default.
@@ -2342,13 +2373,17 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
         struct JDK1_1InitArgs args1_1;
         memset((void*)&args1_1, 0, sizeof(args1_1));
         args1_1.version = JNI_VERSION_1_1;
+        // 获取ifn信息？？？？？
         ifn->GetDefaultJavaVMInitArgs(&args1_1);  /* ignore return value */
         if (args1_1.javaStackSize > 0) {
             threadStackSize = args1_1.javaStackSize;
         }
     }
 
-    { /* Create a new thread to create JVM and invoke main method */
+
+    { 
+        // 这样操作不会为什么不会一直死循环？？？？？
+        /* Create a new thread to create JVM and invoke main method */
         JavaMainArgs args;
         int rslt;
 
@@ -2357,7 +2392,7 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
         args.mode = mode;
         args.what = what;
         args.ifn = *ifn;
-
+        // 创建Java主线程
         rslt = CallJavaMainInNewThread(threadStackSize, (void*)&args);
         /* If the caller has deemed there is an error we
          * simply return that, otherwise we return the value of
@@ -2367,6 +2402,7 @@ ContinueInNewThread(InvocationFunctions* ifn, jlong threadStackSize,
     }
 }
 
+// 打印当前启动器状态信息, 包含使用传入的参数.
 static void
 DumpState()
 {

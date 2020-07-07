@@ -134,6 +134,7 @@ class ObjectMonitor {
 
   // The sync code expects the header field to be at offset zero (0).
   // Enforced by the assert() in header_addr().
+  // 监控对象 volatile标记
   volatile markWord _header;        // displaced object header word - mark
   void* volatile _object;           // backward object pointer - strong root
  private:
