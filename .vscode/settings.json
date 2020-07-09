@@ -8,6 +8,7 @@
         "optional": "cpp",
         "utility": "cpp",
         "__config": "cpp",
-        "__threading_support": "cpp"
+        "__threading_support": "cpp",
+        "jvm.h": "c"
     }
 }

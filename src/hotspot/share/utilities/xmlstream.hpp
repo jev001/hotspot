@@ -34,6 +34,7 @@ class defaultStream;
 // Sub-stream for writing quoted text, as opposed to markup.
 // Characters written to this stream are subject to quoting,
 // as '<' => "&lt;", etc.
+// xml文件流处理
 class xmlTextStream : public outputStream {
   friend class xmlStream;
   friend class defaultStream; // tty

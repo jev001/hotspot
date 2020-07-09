@@ -65,11 +65,13 @@ inline bool os::PlatformMutex::try_lock() {
   return status == 0;
 }
 
+// 信号 会对cond 中需要对同一个 mutex 中的一个加锁的对象进行唤醒操作
 inline void os::PlatformMonitor::notify() {
   int status = pthread_cond_signal(cond());
   assert_status(status == 0, status, "cond_signal");
 }
 
+// 广播 会对cond 中需要对同一个 mutex 加锁的对象进行唤醒操作
 inline void os::PlatformMonitor::notify_all() {
   int status = pthread_cond_broadcast(cond());
   assert_status(status == 0, status, "cond_broadcast");

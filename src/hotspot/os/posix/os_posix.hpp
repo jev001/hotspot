@@ -245,6 +245,7 @@ class PlatformParker : public CHeapObj<mtSynchronizer> {
 
 // Platform specific implementations that underpin VM Mutex/Monitor classes
 
+// 平台互斥锁--->简称互斥锁
 class PlatformMutex : public CHeapObj<mtSynchronizer> {
 #if PLATFORM_MONITOR_IMPL_INDIRECT
   class Mutex : public CHeapObj<mtSynchronizer> {

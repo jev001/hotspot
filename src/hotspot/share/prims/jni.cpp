@@ -3715,6 +3715,7 @@ _JNI_IMPORT_OR_EXPORT_ jint JNICALL JNI_GetDefaultJavaVMInitArgs(void *args_) {
 DT_RETURN_MARK_DECL(CreateJavaVM, jint
                     , HOTSPOT_JNI_CREATEJAVAVM_RETURN(_ret_ref));
 
+// 创建JVM开始
 static jint JNI_CreateJavaVM_inner(JavaVM **vm, void **penv, void *args) {
     // hotspot 创建JVM 入口
   HOTSPOT_JNI_CREATEJAVAVM_ENTRY((void **) vm, penv, args);
@@ -3774,7 +3775,7 @@ static jint JNI_CreateJavaVM_inner(JavaVM **vm, void **penv, void *args) {
    */
   bool can_try_again = true;
 
-    // 线程执行创建JVM 的方法？？？这是啥情况？
+    // 线程执行创建JVM 的方法？？？这是啥情况？创建虚拟机
   result = Threads::create_vm((JavaVMInitArgs*) args, &can_try_again);
   if (result == JNI_OK) {
     JavaThread *thread = JavaThread::current();

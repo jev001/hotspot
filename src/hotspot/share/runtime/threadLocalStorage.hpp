@@ -37,12 +37,16 @@ class Thread;
 // Platforms without compiler-based TLS (i.e. __thread storage-class modifier)
 // will use this implementation for all TLS access - see thread.hpp/cpp
 
+// 线程本地变量存储
 class ThreadLocalStorage : AllStatic {
 
- // Exported API
+ // Exported API // 定义接口
  public:
+    //返回当前线程
   static Thread* thread(); // return current thread, if attached
+  // 将线程塞入
   static void    set_thread(Thread* thread); // set current thread
+  // 初始化
   static void    init();
   static bool    is_initialized(); // can't use TLS prior to initialization
 };

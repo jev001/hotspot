@@ -46,6 +46,7 @@ char* AllocateHeap(size_t size,
   return p;
 }
 
+// 堆上分配
 char* AllocateHeap(size_t size,
                    MEMFLAGS flags,
                    AllocFailType alloc_failmode /* = AllocFailStrategy::EXIT_OOM*/) {

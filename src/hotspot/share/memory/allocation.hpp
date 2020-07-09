@@ -30,9 +30,15 @@
 
 #include <new>
 
+// 内存分配模板----> JVM将内存划分了几个区域--->方便统一管理
+
+
 class outputStream;
 class Thread;
 
+// 内存分配失败策略
+// 1. 退出-抛出异常OOM
+// 2. 返回NULL(这个操作少见)
 class AllocFailStrategy {
 public:
   enum AllocFailEnum { EXIT_OOM, RETURN_NULL };
@@ -114,6 +120,7 @@ class AllocatedObj {
 };
 #endif
 
+//内存类型标记？？？？？这个的用处是什么
 #define MEMORY_TYPES_DO(f) \
   /* Memory type by sub systems. It occupies lower byte. */  \
   f(mtJavaHeap,      "Java Heap")   /* Java heap                                 */ \
@@ -147,6 +154,7 @@ class AllocatedObj {
   type,
 
 /*
+* 内存标记的作用 是什么(用来标记是否需要Track????)
  * Memory types
  */
 enum MemoryType {
@@ -187,8 +195,10 @@ char* ReallocateHeap(char *old,
 // handles NULL pointers
 void FreeHeap(void* p);
 
+// 堆对象分配模板
 template <MEMFLAGS F> class CHeapObj ALLOCATION_SUPER_CLASS_SPEC {
  public:
+ //重写了new关键字的操作----->之后使用 new 关键字调用
   ALWAYSINLINE void* operator new(size_t size) throw() {
     return (void*)AllocateHeap(size, F);
   }
@@ -232,6 +242,7 @@ template <MEMFLAGS F> class CHeapObj ALLOCATION_SUPER_CLASS_SPEC {
 // Base class for objects allocated on the stack only.
 // Calling new or delete will result in fatal error.
 
+// 静态对象
 class StackObj ALLOCATION_SUPER_CLASS_SPEC {
  private:
   void* operator new(size_t size) throw();
@@ -251,6 +262,7 @@ class StackObj ALLOCATION_SUPER_CLASS_SPEC {
 class ClassLoaderData;
 class MetaspaceClosure;
 
+// 元数据对象
 class MetaspaceObj {
   friend class VMStructs;
   // When CDS is enabled, all shared metaspace objects are mapped
@@ -348,6 +360,7 @@ class MetaspaceObj {
 
 class Arena;
 
+// 全局静态类,不能被构造和析构
 class AllStatic {
  public:
   AllStatic()  { ShouldNotCallThis(); }

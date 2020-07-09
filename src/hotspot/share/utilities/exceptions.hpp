@@ -58,8 +58,11 @@ class methodHandle;
 // field of the Thread class w/o having access to the Thread's interface (for
 // include hierachy reasons).
 
+// 影子线程---->可以访问等待中的线程异常信息---->先创建一个虚拟线程？？
 class ThreadShadow: public CHeapObj<mtThread> {
+    // 虚拟结构体？？？
   friend class VMStructs;
+  //javaVM ci 虚拟结构体？？？ 
   friend class JVMCIVMStructs;
 
  protected:
@@ -101,6 +104,9 @@ class ThreadShadow: public CHeapObj<mtThread> {
 // relatively rare. The Exceptions operations should only be
 // used directly if the macros below are insufficient.
 
+/**
+ * 异常处理类--->
+ */
 class Exceptions {
   static bool special_exception(Thread *thread, const char* file, int line, Handle exception);
   static bool special_exception(Thread* thread, const char* file, int line, Symbol* name, const char* message);

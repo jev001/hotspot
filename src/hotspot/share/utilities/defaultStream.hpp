@@ -27,6 +27,7 @@
 
 #include "utilities/xmlstream.hpp"
 
+// 默认流处理？？？？
 class defaultStream : public xmlTextStream {
   friend void ostream_abort();
  public:

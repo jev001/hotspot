@@ -218,6 +218,7 @@ void JavaThread::smr_delete() {
 
 DEBUG_ONLY(Thread* Thread::_starting_thread = NULL;)
 
+// 线程对象
 Thread::Thread() {
 
   DEBUG_ONLY(_run_state = PRE_CALL_RUN;)
@@ -1282,6 +1283,7 @@ void NonJavaThread::Iterator::step() {
   _current = Atomic::load_acquire(&_current->_next);
 }
 
+// 线程对象----->不隶属于Java管理？？？？
 NonJavaThread::NonJavaThread() : Thread(), _next(NULL) {
   assert(BarrierSet::barrier_set() != NULL, "NonJavaThread created too soon!");
 }
@@ -3739,7 +3741,7 @@ void Threads::initialize_jsr292_core_classes(TRAPS) {
   initialize_class(vmSymbols::java_lang_invoke_MethodHandleNatives(), CHECK);
 }
 
-// java 创建线程的方法
+// java 创建虚拟机线程的方法(包含创建GC线程,创建以及程序计时器)
 jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   extern void JDK_Version_init();
 
@@ -3764,6 +3766,7 @@ jint Threads::create_vm(JavaVMInitArgs* args, bool* canTryAgain) {
   // 系统初始化
   os::init();
 
+    // 创建虚拟机时钟------>用到的System.nanoTime
   // Record VM creation timing statistics
   TraceVmCreationTime create_vm_timer;
   create_vm_timer.start();

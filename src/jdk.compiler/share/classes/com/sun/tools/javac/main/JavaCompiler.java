@@ -25,162 +25,44 @@
 
 package com.sun.tools.javac.main;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.lang.module.ModuleFinder;fferedWriter;
+import java.io.ception;
+import java.lang.module.ModuleFinder;fferedWriter;
+import java.io.ception;
+import java.lang.module.ModuleFi
+import java.util.List;nder;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.ut
+import java.util.List;il.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+im
+import java.util.concurrent.Flow;port java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
+import java.util.Missin
+import java.util.concurrent.Flow;gResourceException;
 import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.Flow;
 import java.util.function.Function;
 
 import javax.annotation.processing.Processor;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.ElementVisitor;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
-import javax.tools.StandardLocation;
+import ja
 
-import com.sun.source.util.TaskEvent;
-import com.sun.tools.javac.api.MultiTaskListener;
-import com.sun.tools.javac.code.*;
-import com.sun.tools.javac.code.Lint.LintCategory;
-import com.sun.tools.javac.code.Source.Feature;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import com.sun.tools.javac.code.Symbol.CompletionFailure;
-import com.sun.tools.javac.code.Symbol.PackageSymbol;
-import com.sun.tools.javac.comp.*;
-import com.sun.tools.javac.comp.CompileStates.CompileState;
-import com.sun.tools.javac.file.JavacFileManager;
-import com.sun.tools.javac.jvm.*;
-import com.sun.tools.javac.parser.*;
-import com.sun.tools.javac.platform.PlatformDescription;
-import com.sun.tools.javac.processing.*;
-import com.sun.tools.javac.tree.*;
-import com.sun.tools.javac.tree.JCTree.JCClassDecl;
-import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
-import com.sun.tools.javac.tree.JCTree.JCExpression;
-import com.sun.tools.javac.tree.JCTree.JCLambda;
-import com.sun.tools.javac.tree.JCTree.JCMemberReference;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import com.sun.tools.javac.util.*;
-import com.sun.tools.javac.util.DefinedBy.Api;
-import com.sun.tools.javac.util.JCDiagnostic.Factory;
-import com.sun.tools.javac.util.Log.DiagnosticHandler;
-import com.sun.tools.javac.util.Log.DiscardDiagnosticHandler;
-import com.sun.tools.javac.util.Log.WriterKind;
+import org.w3c.dom.Attr;
+import org.xml.sax.helpers.ParserFactory;
 
-import static com.sun.tools.javac.code.Kinds.Kind.*;
-
-import com.sun.tools.javac.code.Symbol.ModuleSymbol;
-import com.sun.tools.javac.resources.CompilerProperties.Errors;
-import com.sun.tools.javac.resources.CompilerProperties.Fragments;
-import com.sun.tools.javac.resources.CompilerProperties.Notes;
-import com.sun.tools.javac.resources.CompilerProperties.Warnings;
-
-import static com.sun.tools.javac.code.TypeTag.CLASS;
-import static com.sun.tools.javac.main.Option.*;
-import static com.sun.tools.javac.util.JCDiagnostic.DiagnosticFlag.*;
-
-import static javax.tools.StandardLocation.CLASS_OUTPUT;
-
-import com.sun.tools.javac.tree.JCTree.JCModuleDecl;
-
-/** This class could be the main entry point for GJC when GJC is used as a
- *  component in a larger software system. It provides operations to
- *  construct a new compiler, and to run a new compiler on a set of source
- *  files.
- *
- *  <p><b>This is NOT part of any supported API.
- *  If you write code that depends on this, you do so at your own risk.
- *  This code and its internal interfaces are subject to change or
- *  deletion without notice.</b>
- */
-public class JavaCompiler {
-    /** The context key for the compiler. */
-    public static final Context.Key<JavaCompiler> compilerKey = new Context.Key<>();
-
-    /** Get the JavaCompiler instance for this context. */
-    public static JavaCompiler instance(Context context) {
-        JavaCompiler instance = context.get(compilerKey);
-        if (instance == null)
-            instance = new JavaCompiler(context);
-        return instance;
-    }
-
-    /** The current version number as a string.
-     */
-    public static String version() {
-        return version("release");  // mm.nn.oo[-milestone]
-    }
-
-    /** The current full version number as a string.
-     */
-    public static String fullVersion() {
-        return version("full"); // mm.mm.oo[-milestone]-build
-    }
-
-    private static final String versionRBName = "com.sun.tools.javac.resources.version";
-    private static ResourceBundle versionRB;
-
-    private static String version(String key) {
-        if (versionRB == null) {
-            try {
-                versionRB = ResourceBundle.getBundle(versionRBName);
-            } catch (MissingResourceException e) {
-                return Log.getLocalizedString("version.not.available");
-            }
-        }
-        try {
-            return versionRB.getString(key);
-        }
-        catch (MissingResourceException e) {
-            return Log.getLocalizedString("version.not.available");
-        }
-    }
-
-    /**
-     * Control how the compiler's latter phases (attr, flow, desugar, generate)
-     * are connected. Each individual file is processed by each phase in turn,
-     * but with different compile policies, you can control the order in which
-     * each class is processed through its next phase.
-     *
-     * <p>Generally speaking, the compiler will "fail fast" in the face of
-     * errors, although not aggressively so. flow, desugar, etc become no-ops
-     * once any errors have occurred. No attempt is currently made to determine
-     * if it might be safe to process a class through its next phase because
-     * it does not depend on any unrelated errors that might have occurred.
-     */
-    protected static enum CompilePolicy {
-        /**
-         * Just attribute the parse trees.
-         */
-        ATTR_ONLY,
-
-        /**
-         * Just attribute and do flow analysis on the parse trees.
-         * This should catch most user errors.
-         */
-        CHECK_ONLY,
-
-        /**
-         * Attribute everything, then do flow analysis for everything,
-         * then desugar everything, and only then generate output.
-         * This means no output will be generated if there are any
-         * errors in any classes.
-         */
-        SIMPLE,
-
-        /**
-         * Groups the classes for each source file together, then process
+import jdk.internal.module.Modules;
+import jdk.internal.org.objectweb.asm.ClassReader;
+import jdk.internal.org.objectweb.asm.tree.analysis.Analyzer;
+import jdk.nashorn.internal.runtime.regexp.joni.Warnings;
+import sun.jvm.hotspot.utilities.Assert;
+import sun.rmi.rmic.Names; the classes for each source file together, then process
          * each group in a manner equivalent to the {@code SIMPLE} policy.
          * This means no output will be generated if there are any
          * errors in any of the classes in a source file.
