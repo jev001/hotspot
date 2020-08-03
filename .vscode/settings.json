@@ -11,6 +11,8 @@
         "__threading_support": "cpp",
         "jvm.h": "c",
         "*.in_out": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "cstdlib": "cpp",
+        "locale": "cpp"
     }
 }

@@ -553,6 +553,7 @@ public:
         BiasedLocking::walk_stack_and_revoke(o, _biased_locker);
         _biased_locker->set_cached_monitor_info(NULL);
         assert(!o->mark().has_bias_pattern(), "invariant");
+        // 获取线程编号, 
         _biased_locker_id = JFR_THREAD_ID(_biased_locker);
         _status_code = BiasedLocking::BIAS_REVOKED;
         return;
@@ -664,6 +665,7 @@ BiasedLocking::Condition BiasedLocking::single_revoke_with_handshake(Handle obj,
 }
 
 
+// 遍历obj引用栈 进行撤销------> 引用对象有很多, 需要逐步排查
 // Caller should have instantiated a ResourceMark object before calling this method
 void BiasedLocking::walk_stack_and_revoke(oop obj, JavaThread* biased_locker) {
   Thread* cur = Thread::current();
@@ -823,9 +825,10 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
       return;
       // 如果使用了偏向锁 那么执行单次撤销
     } else if (heuristics == HR_SINGLE_REVOKE) {
+        // 如果标记为中的locker 
       JavaThread *blt = mark.biased_locker();
       assert(blt != NULL, "invariant");
-      // 当前线程
+      // 当前线程 是否是标记为中的线程, 如果是 那么就开始车脚
       if (blt == THREAD) {
         // A thread is trying to revoke the bias of an object biased
         // toward it, again likely due to an identity hash code
@@ -835,7 +838,9 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
         // reach no safepoints in the revocation path.
         EventBiasedLockSelfRevocation event;
         ResourceMark rm;
+        // 
         walk_stack_and_revoke(obj(), blt);
+        // 将缓存的监控信息 置空
         blt->set_cached_monitor_info(NULL);
         assert(!obj->mark().has_bias_pattern(), "invariant");
         if (event.should_commit()) {

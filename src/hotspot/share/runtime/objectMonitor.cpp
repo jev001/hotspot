@@ -890,6 +890,7 @@ void ObjectMonitor::exit(bool not_suspended, TRAPS) {
   }
 
   if (_recursions != 0) {
+      // 计数器 进入了多少次 锁的计数
     _recursions--;        // this is simple recursive enter
     return;
   }

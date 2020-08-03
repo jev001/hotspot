@@ -579,6 +579,7 @@ void ObjectSynchronizer::exit(oop object, BasicLock* lock, TRAPS) {
     // If the displaced header is NULL, then this exit matches up with
     // a recursive enter. No real work to do here except for diagnostics.
 #ifndef PRODUCT
+    // 如果当前标记没有膨胀---> 没有经历过 enter 的inflat  这种情况就是 偏向锁和轻量级锁的情况  直接退出
     if (mark != markWord::INFLATING()) {
       // Only do diagnostics if we are not racing an inflation. Simply
       // exiting a recursive enter of a Java Monitor that is being
@@ -604,6 +605,7 @@ void ObjectSynchronizer::exit(oop object, BasicLock* lock, TRAPS) {
     return;
   }
 
+  // 重新设置 lock 
   if (mark == markWord::from_pointer(lock)) {
     // If the object is stack-locked by the current thread, try to
     // swing the displaced header from the BasicLock back to the mark.
@@ -613,6 +615,7 @@ void ObjectSynchronizer::exit(oop object, BasicLock* lock, TRAPS) {
     }
   }
 
+  // 重量级锁的退出
   // We have to take the slow-path of possible inflation and then exit.
   inflate(THREAD, object, inflate_cause_vm_internal)->exit(true, THREAD);
 }
