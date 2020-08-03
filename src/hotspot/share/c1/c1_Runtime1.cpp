@@ -702,6 +702,7 @@ JRT_END
 
 JRT_BLOCK_ENTRY(void, Runtime1::monitorenter(JavaThread* thread, oopDesc* obj, BasicObjectLock* lock))
   NOT_PRODUCT(_monitorenter_slowcase_cnt++;)
+  // 是否使用快速锁？ 如果使用快速锁那么进入快速所防卫
   if (!UseFastLocking) {
     lock->set_obj(obj);
   }

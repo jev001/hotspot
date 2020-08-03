@@ -152,12 +152,16 @@ class ObjectMonitor {
   // cache line with _owner.
   DEFINE_PAD_MINUS_SIZE(1, OM_CACHE_LINE_SIZE, sizeof(void* volatile) +
                         sizeof(volatile jlong));
+  // 下一个 objectMonitor 
   ObjectMonitor* _next_om;          // Next ObjectMonitor* linkage
+  // ？？？ 为什么需要递归
   volatile intx _recursions;        // recursion count, 0 for first entry
+  // 监控等待列表 线程锁住后,有一个列表记录了所有的等待的线程的列表
   ObjectWaiter* volatile _EntryList;  // Threads blocked on entry or reentry.
                                       // The list is actually composed of WaitNodes,
                                       // acting as proxies for Threads.
 
+    // 最近访问的 对象等待器
   ObjectWaiter* volatile _cxq;      // LL of recently-arrived threads blocked on entry.
   Thread* volatile _succ;           // Heir presumptive thread - used for futile wakeup throttling
   Thread* volatile _Responsible;

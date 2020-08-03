@@ -458,16 +458,23 @@ bool ObjectSynchronizer::quick_notify(oopDesc* obj, Thread* self, bool all) {
 
 bool ObjectSynchronizer::quick_enter(oop obj, Thread* self,
                                      BasicLock * lock) {
+    // jvm safepoint 检测                                         
   assert(!SafepointSynchronize::is_at_safepoint(), "invariant");
+  // 只针对java 线程有效
   assert(self->is_Java_thread(), "invariant");
+  // 检测线程状态
   assert(((JavaThread *) self)->thread_state() == _thread_in_Java, "invariant");
   NoSafepointVerifier nsv;
+  // 空指针对象是不可以访问的,因为 需要去得到 java对象中的mark标记
   if (obj == NULL) return false;       // Need to throw NPE
   const markWord mark = obj->mark();
 
+  // 当前标记是否已经获取到监控器
   if (mark.has_monitor()) {
+      // 获取监控对象
     ObjectMonitor* const m = mark.monitor();
     assert(m->object() == obj, "invariant");
+    // 获取当前mark 对象的 线程是当前线程, 那么返回true  然后记录一下 访问记录
     Thread* const owner = (Thread *) m->_owner;
 
     // Lock contention and Transactional Lock Elision (TLE) diagnostics
@@ -475,6 +482,7 @@ bool ObjectSynchronizer::quick_enter(oop obj, Thread* self,
     // Case: light contention possibly amenable to TLE
     // Case: TLE inimical operations such as nested/recursive synchronization
 
+    // 如果当前线程和标记的线程是一个 那么就直接返回 通过quit_enter
     if (owner == self) {
       m->_recursions++;
       return true;
@@ -490,8 +498,10 @@ bool ObjectSynchronizer::quick_enter(oop obj, Thread* self,
     // stack-locking in the object's header, the third check is for
     // recursive stack-locking in the displaced header in the BasicLock,
     // and last are the inflated Java Monitor (ObjectMonitor) checks.
+    // 清空标记
     lock->set_displaced_header(markWord::unused_mark());
-
+    // 尝试将自己设置成mark  通过 cas方式
+    // 这个是在 ower 为空的情况下 才这么做, 也是为了避免直接进入到 slow enter 里面
     if (owner == NULL && m->try_set_owner_from(NULL, self) == NULL) {
       assert(m->_recursions == 0, "invariant");
       return true;
@@ -505,6 +515,7 @@ bool ObjectSynchronizer::quick_enter(oop obj, Thread* self,
   // -- block indefinitely, or
   // -- reach a safepoint
 
+  // 偏向锁检测失败.. 使用 比较缓慢的方式 获取锁  ----偏量锁--->轻量级/重量锁
   return false;        // revert to slow-path
 }
 
@@ -513,8 +524,10 @@ bool ObjectSynchronizer::quick_enter(oop obj, Thread* self,
 // The interpreter and compiler assembly code tries to lock using the fast path
 // of this algorithm. Make sure to update that code if the following function is
 // changed. The implementation is extremely sensitive to race condition. Be careful.
-
+// TRAPS 持有的是 对象的值 为啥这么多的地方需要这么做？？？？ TRAPS 为形参, THREAD* THREAD 
+// 内部变量 THREAD  为实参数 __the_thread__ 
 void ObjectSynchronizer::enter(Handle obj, BasicLock* lock, TRAPS) {
+    // 是不是使用了偏向锁？---JVM参数
   if (UseBiasedLocking) {
     if (!SafepointSynchronize::is_at_safepoint()) {
       BiasedLocking::revoke(obj, THREAD);
@@ -526,6 +539,7 @@ void ObjectSynchronizer::enter(Handle obj, BasicLock* lock, TRAPS) {
   markWord mark = obj->mark();
   assert(!mark.has_bias_pattern(), "should not see bias pattern here");
 
+  // 锁是中立锁 没有获取到偏向锁 
   if (mark.is_neutral()) {
     // Anticipate successful CAS -- the ST of the displaced mark must
     // be visible <= the ST performed by the CAS.
@@ -534,6 +548,9 @@ void ObjectSynchronizer::enter(Handle obj, BasicLock* lock, TRAPS) {
       return;
     }
     // Fall through to inflate() ...
+    // 如果是偏量锁  查看是否获取到了锁并且 当前锁持有当前线程的id
+    // 如果有锁住 但是没有当前锁持有的线程id 不匹配 那么膨胀成重量所
+
   } else if (mark.has_locker() &&
              THREAD->is_lock_owned((address)mark.locker())) {
     assert(lock != mark.locker(), "must not re-lock the same lock");
@@ -546,6 +563,7 @@ void ObjectSynchronizer::enter(Handle obj, BasicLock* lock, TRAPS) {
   // so it does not matter what the value is, except that it
   // must be non-zero to avoid looking like a re-entrant lock,
   // and must not look locked either.
+  // 设置成未使用锁
   lock->set_displaced_header(markWord::unused_mark());
   inflate(THREAD, obj(), inflate_cause_monitor_enter)->enter(THREAD);
 }

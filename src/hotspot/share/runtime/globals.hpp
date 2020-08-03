@@ -111,7 +111,7 @@ const size_t defaultStringTableSize = NOT_LP64(1024) LP64_ONLY(65536);
 const size_t minimumStringTableSize = 128;
 const size_t defaultSymbolTableSize = 32768; // 2^15
 const size_t minimumSymbolTableSize = 1024;
-
+// 全局变量配置表
 #define RUNTIME_FLAGS(develop, \
                       develop_pd, \
                       product, \

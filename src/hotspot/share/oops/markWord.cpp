@@ -54,6 +54,7 @@ void markWord::print_on(outputStream* st) const {
       }
     } else if (has_bias_pattern()) {  // last bits = 101
       st->print("is_biased");
+      // 偏向锁
       JavaThread* jt = biased_locker();
       st->print(" biased_locker=" INTPTR_FORMAT " epoch=%d", p2i(jt), bias_epoch());
     } else {

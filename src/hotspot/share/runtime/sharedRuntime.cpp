@@ -2082,12 +2082,19 @@ void SharedRuntime::monitor_enter_helper(oopDesc* obj, BasicLock* lock, JavaThre
   // would leave you with the lock held and it would never be released.
   // The normal monitorenter NullPointerException is thrown without acquiring a lock
   // and the model is that an exception implies the method failed.
-  JRT_BLOCK_NO_ASYNC
+  JRT_BLOCK_NO_ASYNC 
+  // 设置 变量THREAD 为 传入的thread 这个是
+//ThreadInVMfromJavaNoAsyncException __tiv(thread);                \
+    Thread* THREAD = thread;                                         \
+    debug_only(VMEntryWrapper __vew;)
+
   if (PrintBiasedLockingStatistics) {
     Atomic::inc(BiasedLocking::slow_path_entry_count_addr());
   }
   Handle h_obj(THREAD, obj);
+    // CHECK 使用的是 THREAD的实参
   ObjectSynchronizer::enter(h_obj, lock, CHECK);
+  // THREAD); if (HAS_PENDING_EXCEPTION) return       ; (void)(0
   assert(!HAS_PENDING_EXCEPTION, "Should have no exception here");
   JRT_BLOCK_END
 }

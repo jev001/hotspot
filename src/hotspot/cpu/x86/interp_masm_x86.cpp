@@ -1170,10 +1170,12 @@ void InterpreterMacroAssembler::get_method_counters(Register method,
 //
 // Kills:
 //      rax, rbx
+// 解释器--->锁对象
 void InterpreterMacroAssembler::lock_object(Register lock_reg) {
   assert(lock_reg == LP64_ONLY(c_rarg1) NOT_LP64(rdx),
          "The argument is only for looks. It must be c_rarg1");
 
+  // 使用重量级监控对象？？？？
   if (UseHeavyMonitors) {
     call_VM(noreg,
             CAST_FROM_FN_PTR(address, InterpreterRuntime::monitorenter),
@@ -1196,6 +1198,7 @@ void InterpreterMacroAssembler::lock_object(Register lock_reg) {
     // Load object pointer into obj_reg
     movptr(obj_reg, Address(lock_reg, obj_offset));
 
+    // 是否使用偏向锁
     if (UseBiasedLocking) {
       biased_locking_enter(lock_reg, obj_reg, swap_reg, tmp_reg, false, done, &slow_case);
     }
@@ -1212,6 +1215,7 @@ void InterpreterMacroAssembler::lock_object(Register lock_reg) {
     assert(lock_offset == 0,
            "displaced header must be first word in BasicObjectLock");
 
+    // 锁住
     lock();
     cmpxchgptr(lock_reg, Address(obj_reg, oopDesc::mark_offset_in_bytes()));
     if (PrintBiasedLockingStatistics) {

@@ -760,7 +760,7 @@ void InterpreterRuntime::resolve_get_put(JavaThread* thread, Bytecodes::Code byt
 // be shared by method invocation and synchronized blocks.
 //%note synchronization_3
 
-//%note monitor_1
+//%note monitor_1 监控第一步？？？？
 JRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, BasicObjectLock* elem))
 #ifdef ASSERT
   thread->last_frame().interpreter_frame_verify_monitor(elem);

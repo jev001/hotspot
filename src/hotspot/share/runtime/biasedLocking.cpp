@@ -748,6 +748,7 @@ void BiasedLocking::revoke_own_lock(Handle obj, TRAPS) {
   }
 }
 
+// 使用偏向锁 撤销, 限制性撤销操作
 void BiasedLocking::revoke(Handle obj, TRAPS) {
   assert(!SafepointSynchronize::is_at_safepoint(), "must not be called while at safepoint");
 
@@ -758,10 +759,12 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
     // revocations (which are expensive) to occur.
     markWord mark = obj->mark();
 
+    // 检查是否有 偏向锁标记匹配 CAS 
     if (!mark.has_bias_pattern()) {
       return;
     }
 
+    // 是否匿名偏向锁
     if (mark.is_biased_anonymously()) {
       // We are probably trying to revoke the bias of this object due to
       // an identity hash code computation. Try to revoke the bias
@@ -771,6 +774,7 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
       // the bias of the object.
       markWord biased_value       = mark;
       markWord unbiased_prototype = markWord::prototype().set_age(mark.age());
+      // 赊销标记, 如果新的mark 和 旧的mark 是一样的 那么直接返回
       markWord res_mark = obj->cas_set_mark(unbiased_prototype, mark);
       if (res_mark == biased_value) {
         return;
@@ -779,6 +783,7 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
     } else {
       Klass* k = obj->klass();
       markWord prototype_header = k->prototype_header();
+      // 当前原型头没有偏向锁标记
       if (!prototype_header.has_bias_pattern()) {
         // This object has a stale bias from before the bulk revocation
         // for this data type occurred. It's pointless to update the
@@ -786,9 +791,11 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
         // CAS. If we fail this race, the object's bias has been revoked
         // by another thread so we simply return and let the caller deal
         // with it.
+        // 这只一个访问次数标记
         obj->cas_set_mark(prototype_header.set_age(mark.age()), mark);
         assert(!obj->mark().has_bias_pattern(), "even if we raced, should still be revoked");
         return;
+        // 如果原型数据有偏向锁的刷新记号 但是刷新加好不是现在的m那么 获取一个新的原型标记
       } else if (prototype_header.bias_epoch() != mark.bias_epoch()) {
         // The epoch of this biasing has expired indicating that the
         // object is effectively unbiased. We can revoke the bias of this
@@ -799,7 +806,9 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
         markWord res_mark;
         markWord biased_value       = mark;
         markWord unbiased_prototype = markWord::prototype().set_age(mark.age());
+        // 
         res_mark = obj->cas_set_mark(unbiased_prototype, mark);
+        // 如果cas 当前获取到的 头和 之前获取到的头 是一样的 那么直接退出
         if (res_mark == biased_value) {
           return;
         }
@@ -807,12 +816,16 @@ void BiasedLocking::revoke(Handle obj, TRAPS) {
       }
     }
 
+    // 启发式结果？？？？预检查是否是 偏向锁
     HeuristicsResult heuristics = update_heuristics(obj());
+    // 当前不是偏向锁 直接返回
     if (heuristics == HR_NOT_BIASED) {
       return;
+      // 如果使用了偏向锁 那么执行单次撤销
     } else if (heuristics == HR_SINGLE_REVOKE) {
       JavaThread *blt = mark.biased_locker();
       assert(blt != NULL, "invariant");
+      // 当前线程
       if (blt == THREAD) {
         // A thread is trying to revoke the bias of an object biased
         // toward it, again likely due to an identity hash code

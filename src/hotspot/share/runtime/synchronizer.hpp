@@ -70,6 +70,7 @@ class ObjectSynchronizer : AllStatic {
     inflate_cause_nof = 7 // Number of causes
   } InflateCause;
 
+    // 退出的时候实现了无锁退出？？？
   // exit must be implemented non-blocking, since the compiler cannot easily handle
   // deoptimization at monitor exit. Hence, it does not take a Handle argument.
 
@@ -79,6 +80,7 @@ class ObjectSynchronizer : AllStatic {
 
   // Used only to handle jni locks or other unmatched monitor enter/exit
   // Internally they will use heavy weight monitor.
+  // 重量级锁
   static void jni_enter(Handle obj, TRAPS);
   static void jni_exit(oop obj, Thread* THREAD);
 

@@ -21,7 +21,7 @@
  * questions.
  *
  */
-
+// 头标记
 #ifndef SHARE_OOPS_MARKWORD_HPP
 #define SHARE_OOPS_MARKWORD_HPP
 
@@ -141,6 +141,7 @@ class markWord {
   static const uintptr_t lock_mask                = right_n_bits(lock_bits);
   static const uintptr_t lock_mask_in_place       = lock_mask << lock_shift;
   static const uintptr_t biased_lock_mask         = right_n_bits(lock_bits + biased_lock_bits);
+  // 偏向锁占位？？？？
   static const uintptr_t biased_lock_mask_in_place= biased_lock_mask << lock_shift;
   static const uintptr_t biased_lock_bit_in_place = 1 << biased_lock_shift;
   static const uintptr_t age_mask                 = right_n_bits(age_bits);
@@ -171,6 +172,7 @@ class markWord {
   // Creates a markWord with all bits set to zero.
   static markWord zero() { return markWord(uintptr_t(0)); }
 
+  // 偏向锁访问
   // Biased Locking accessors.
   // These must be checked by all code which calls into the
   // ObjectSynchronizer and other code. The biasing is not understood
@@ -219,6 +221,8 @@ class markWord {
   bool is_marked()   const {
     return (mask_bits(value(), lock_mask_in_place) == marked_value);
   }
+
+  // 检查偏向锁的 占位符 如果有值是 未持有锁状态, 那么表示未上锁
   bool is_neutral()  const { return (mask_bits(value(), biased_lock_mask_in_place) == unlocked_value); }
 
   // Special temporary state of the markWord while being inflated.
@@ -298,6 +302,8 @@ class markWord {
   }
   // it is only used to be stored into BasicLock as the
   // indicator that the lock is using heavyweight monitor
+  // 仅仅在 使用重量级监视器 monitor 的时候用来表示 以及使用过 偏向锁了,不做其他的用途
+  // 但是 这个变量的意思是从未使用过mark  奇奇怪怪的
   static markWord unused_mark() {
     return markWord(marked_value);
   }
