@@ -30,6 +30,7 @@
 // forward-decl as we can't have an include cycle
 class Thread;
 
+// 
 // Wrapper class for library-based (as opposed to compiler-based)
 // thread-local storage (TLS). All platforms require this for
 // signal-handler based TLS access (which while not strictly async-signal
@@ -37,7 +38,8 @@ class Thread;
 // Platforms without compiler-based TLS (i.e. __thread storage-class modifier)
 // will use this implementation for all TLS access - see thread.hpp/cpp
 
-// 线程本地变量存储
+// 线程本地变量存储----TLS 在很多地方都有出现过--->这是一个概念性的东西,涉及到线程之间共享数据都会使用到这个
+// Java实现了ThreadLocal java类用来处理线程之间共享数据
 class ThreadLocalStorage : AllStatic {
 
  // Exported API // 定义接口

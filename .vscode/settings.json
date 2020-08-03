@@ -9,6 +9,8 @@
         "utility": "cpp",
         "__config": "cpp",
         "__threading_support": "cpp",
-        "jvm.h": "c"
+        "jvm.h": "c",
+        "*.in_out": "cpp",
+        "ios": "cpp"
     }
 }
