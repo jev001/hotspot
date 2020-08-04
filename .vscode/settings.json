@@ -14,5 +14,6 @@
         "ios": "cpp",
         "cstdlib": "cpp",
         "locale": "cpp"
+        "__threading_support": "cpp"
     }
 }

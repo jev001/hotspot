@@ -607,6 +607,7 @@ LoadJavaVM(const char *jvmpath, InvocationFunctions *ifn)
     }
 
     // 获取创建Jvm的函数地址,函数指针 用这个方式可以获取到 libJvm 中的创建JVM 的函数
+    // 创建虚拟机 ,使用动态链接库创建.(由macos xcode 或者linux 提供)
     ifn->CreateJavaVM = (CreateJavaVM_t)
         dlsym(libjvm, "JNI_CreateJavaVM");
     if (ifn->CreateJavaVM == NULL) {
