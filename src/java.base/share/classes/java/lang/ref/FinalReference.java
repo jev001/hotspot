@@ -26,6 +26,7 @@
 package java.lang.ref;
 
 /**
+ * 终结引用,此引用不由用户添加,由系统添加的引用
  * Final references, used to implement finalization
  */
 class FinalReference<T> extends Reference<T> {

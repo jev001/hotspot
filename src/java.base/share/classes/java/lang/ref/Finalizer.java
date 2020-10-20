@@ -31,6 +31,21 @@ import jdk.internal.access.JavaLangAccess;
 import jdk.internal.access.SharedSecrets;
 import jdk.internal.misc.VM;
 
+/**
+ * 终结引用链是一个双向指针的数据结构,每次添加的都是都会锁住数据
+ * 
+ * 终结引用处理器
+ *   在实例化这个对象的时候,JVM 会通过invoke 的方式调用`register`方法,将实例化的对象添加到
+ * 终结引用链中
+ *   在添加终结引用链之前,jvm会校验一下`has_finalizer`
+ * 
+ * 
+ * 在JVM调用System.runFinalizer()
+ *  jdk9之后将其透传为JavaLangRef然后调用runFinalizer
+ * JVM调用后,其中的终结引用链中对象的引用将被remove,remove操作是双向指针的 前后交换
+ *  交换完成之后,此对象的终结引用将会不可达
+ *
+ */
 final class Finalizer extends FinalReference<Object> { /* Package-private; must be in
                                                           same package as the Reference
                                                           class */
