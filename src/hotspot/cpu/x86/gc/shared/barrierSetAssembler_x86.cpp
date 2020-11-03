@@ -291,6 +291,7 @@ void BarrierSetAssembler::eden_allocate(MacroAssembler* masm,
     // Compare obj with the top addr, and if still equal, store the new top addr in
     // end at the address of the top addr pointer. Sets ZF if was equal, and clears
     // it otherwise. Use lock prefix for atomicity on MPs.
+    // 上锁
     __ locked_cmpxchgptr(end, heap_top);
     __ jcc(Assembler::notEqual, retry);
     incr_allocated_bytes(masm, thread, var_size_in_bytes, con_size_in_bytes, thread->is_valid() ? noreg : t1);

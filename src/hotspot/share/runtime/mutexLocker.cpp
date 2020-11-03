@@ -30,6 +30,7 @@
 #include "runtime/thread.inline.hpp"
 #include "runtime/vmThread.hpp"
 
+// 互斥锁 存放地.
 // Mutexes used in the VM (see comment in mutexLocker.hpp):
 //
 // Note that the following pointers are effectively final -- after having been
