@@ -4,7 +4,13 @@
 			"path": "."
 		}
     ],
-    "settings": {},
+    "settings": {
+        "files.associations": {
+            "*.tcc": "cpp",
+            "memory_resource": "cpp",
+            "sstream": "cpp"
+        }
+    },
     "launch": {
         "version": "0.2.0",
         "configurations": [

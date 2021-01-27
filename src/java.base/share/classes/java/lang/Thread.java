@@ -180,9 +180,11 @@ public class Thread implements Runnable {
 
     /* ThreadLocal values pertaining to this thread. This map is maintained
      * by the ThreadLocal class. */
+    // 线程本地变量
     ThreadLocal.ThreadLocalMap threadLocals = null;
 
     /*
+      可以继承的 线程本地变量, 用作从父线程中获取的
      * InheritableThreadLocal values pertaining to this thread. This map is
      * maintained by the InheritableThreadLocal class.
      */
@@ -196,18 +198,24 @@ public class Thread implements Runnable {
     private final long stackSize;
 
     /*
+    线程编号。
      * Thread ID
      */
     private final long tid;
 
     /* For generating thread ID */
+    // 线程序列化编号
     private static long threadSeqNumber;
 
+    /**
+     * 获取新的线程ID===> 发生在创建新的线程的时候
+     */
     private static synchronized long nextThreadID() {
         return ++threadSeqNumber;
     }
 
     /*
+     线程状态. 
      * Java thread status for tools, default indicates thread 'not yet started'
      */
     private volatile int threadStatus;
@@ -443,6 +451,7 @@ public class Thread implements Runnable {
                 acc != null ? acc : AccessController.getContext();
         this.target = target;
         setPriority(priority);
+        // 需要
         if (inheritThreadLocals && parent.inheritableThreadLocals != null)
             this.inheritableThreadLocals =
                 ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
