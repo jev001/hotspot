@@ -39,3 +39,4 @@ src/utils/LogCompilation/target/classes/com/sun/hotspot/tools/compiler/UncommonT
 src/utils/LogCompilation/target/test-classes/com/sun/hotspot/tools/compiler/TestCompare.class
 src/utils/LogCompilation/target/test-classes/com/sun/hotspot/tools/compiler/TestLogCompilation.class
 test/failure_handler/src/share/classes/jdk/test/failurehandler/jtreg/GatherDiagnosticInfoObserver.java
+*.udb
