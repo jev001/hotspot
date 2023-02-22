@@ -1,39 +1,36 @@
-configure: Configuration created at Fri Jun 26 12:37:29 CST 2020.
+configure: Configuration created at Thu Oct 13 08:52:59 UTC 2022.
 checking for basename... /usr/bin/basename
-checking for bash... /bin/bash
-checking for cat... /bin/cat
-checking for chmod... /bin/chmod
+checking for bash... /usr/bin/bash
+checking for cat... /usr/bin/cat
+checking for chmod... /usr/bin/chmod
 checking for cmp... /usr/bin/cmp
 checking for comm... /usr/bin/comm
-checking for cp... /bin/cp
+checking for cp... /usr/bin/cp
 checking for cut... /usr/bin/cut
-checking for date... /bin/date
+checking for date... /usr/bin/date
 checking for gdiff... no
 checking for diff... /usr/bin/diff
 checking for dirname... /usr/bin/dirname
-checking for echo... /bin/echo
-checking for expr... /bin/expr
+checking for echo... /usr/bin/echo
+checking for expr... /usr/bin/expr
 checking for file... /usr/bin/file
 checking for find... /usr/bin/find
 checking for head... /usr/bin/head
 checking for gunzip... /usr/bin/gunzip
-checking for pigz... no
-checking for gzip... /usr/bin/gzip
-checking for ln... /bin/ln
-checking for ls... /bin/ls
+checking for pigz... /usr/bin/pigz
+checking for ln... /usr/bin/ln
+checking for ls... /usr/bin/ls
 checking for gmkdir... no
-checking for mkdir... /bin/mkdir
+checking for mkdir... /usr/bin/mkdir
 checking for mktemp... /usr/bin/mktemp
-checking for mv... /bin/mv
-checking for nawk... no
-checking for gawk... no
-checking for awk... /usr/bin/awk
+checking for mv... /usr/bin/mv
+checking for nawk... /usr/bin/nawk
 checking for printf... /usr/bin/printf
 checking for greadlink... no
 checking for readlink... /usr/bin/readlink
-checking for rm... /bin/rm
-checking for rmdir... /bin/rmdir
-checking for sh... /bin/sh
+checking for rm... /usr/bin/rm
+checking for rmdir... /usr/bin/rmdir
+checking for sh... /usr/bin/sh
 checking for sort... /usr/bin/sort
 checking for tail... /usr/bin/tail
 checking for gtar... no
@@ -46,144 +43,83 @@ checking for uniq... /usr/bin/uniq
 checking for wc... /usr/bin/wc
 checking for which... /usr/bin/which
 checking for xargs... /usr/bin/xargs
-checking for gawk... no
-checking for mawk... no
-checking for nawk... no
-checking for awk... awk
+checking for gawk... gawk
 checking for grep that handles long lines and -e... /usr/bin/grep
 checking for egrep... /usr/bin/grep -E
 checking for fgrep... /usr/bin/grep -F
 checking for a sed that does not truncate output... /usr/bin/sed
 checking for cygpath... no
 checking for wslpath... no
-checking for df... /bin/df
+checking for df... /usr/bin/df
 checking for cpio... /usr/bin/cpio
 checking for nice... /usr/bin/nice
-checking for lsb_release... no
+checking for lsb_release... /usr/bin/lsb_release
 checking for cmd.exe... no
 checking for /mnt/c/Windows/System32/cmd.exe... no
-checking build system type... x86_64-apple-darwin19.5.0
-checking host system type... x86_64-apple-darwin19.5.0
-checking target system type... x86_64-apple-darwin19.5.0
-checking openjdk-build os-cpu... macosx-x86_64
-checking openjdk-target os-cpu... macosx-x86_64
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking target system type... x86_64-unknown-linux-gnu
+checking openjdk-build os-cpu... linux-x86_64
+checking openjdk-target os-cpu... linux-x86_64
 checking compilation type... native
 checking for --enable-deprecated-ports... disabled, default
-checking for top-level directory... /Users/jonah/opensources/openjdk
+checking for top-level directory... /home/ubuntu/sources/opensources/hotspot
 checking if custom source is suppressed (openjdk-only)... disabled, default
 checking for --enable-debug... disabled, default
 checking which debug level to use... release
 checking which variants of the JVM to build... server
 checking if absolute paths should be allowed in the build output... no, release build
-checking for xcodebuild... /usr/bin/xcodebuild
-checking for sdk name... 
-checking for sysroot... /Applications/Xcode10.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk
+checking for sysroot... 
 checking for toolchain path... 
 checking for extra path... 
 checking where to store configuration... in default location
-checking what configuration name to use... macosx-x86_64-server-release
+checking what configuration name to use... linux-x86_64-server-release
 checking for zypper... no
-checking for apt-get... no
-checking for yum... no
-checking for brew... brew
+checking for apt-get... apt-get
 checking for pandoc... no
-checking for gmake... no
-checking for make... /usr/bin/make
-configure: Testing potential make at /usr/bin/make, found using make in PATH
-configure: Using GNU make at /usr/bin/make (version: GNU Make 3.81)
-checking if make --output-sync is supported... no
+checking for gmake... /usr/bin/gmake
+configure: Testing potential make at /usr/bin/gmake, found using gmake in PATH
+configure: Using GNU make at /usr/bin/gmake (version: GNU Make 4.3)
+checking if make --output-sync is supported... yes
+checking for output-sync value... none
 checking if find supports -delete... yes
-checking what type of tar was found... bsd
+checking what type of tar was found... gnu
 checking that grep (/usr/bin/grep) -Fx handles empty lines in the pattern list correctly... yes
 checking for unzip... /usr/bin/unzip
 checking for zip... /usr/bin/zip
-checking for ldd... no
+checking for ldd... /usr/bin/ldd
 checking for greadelf... no
-checking for readelf... no
+checking for readelf... /usr/bin/readelf
 checking for dot... no
 checking for hg... no
-checking for git... /usr/local/bin/git
+checking for git... /usr/bin/git
 checking for stat... /usr/bin/stat
 checking for time... /usr/bin/time
-checking for flock... no
-checking for dtrace... /usr/sbin/dtrace
+checking for flock... /usr/bin/flock
+checking for dtrace... no
 checking for gpatch... no
 checking for patch... /usr/bin/patch
-checking for dsymutil... /usr/bin/dsymutil
-checking for mig... /usr/bin/mig
-checking for xattr... /usr/bin/xattr
-checking for codesign... /usr/bin/codesign
-checking if codesign certificate is present... yes
-checking if codesign has --option runtime... yes
-checking for SetFile... /usr/bin/SetFile
-checking for ulimit... /usr/bin/ulimit
-checking bash version... 3.2.57
+checking for ulimit... no
+configure: Required tool ulimit not found in PATH, checking built-in
+configure: Found ulimit as shell built-in. Using it
+checking bash version... 5.1.16
 checking if bash supports pipefail... yes
 checking if bash supports errexit (-e)... yes
-checking for pkg-config... /usr/local/bin/pkg-config
+checking for pkg-config... /usr/bin/pkg-config
 checking pkg-config is at least version 0.9.0... yes
 checking for default LOG value... 
 checking if packaged modules are kept... enabled, default
-checking for version string... 15-internal+0-adhoc.jonah.openjdk
-configure: Found potential Boot JDK using /usr/libexec/java_home 
-checking for Boot JDK... /Library/Java/JavaVirtualMachines/jdk-14.0.1.jdk/Contents/Home
-checking Boot JDK version... openjdk version "14.0.1" 2020-04-14 OpenJDK Runtime Environment (build 14.0.1+7) OpenJDK 64-Bit Server VM (build 14.0.1+7, mixed mode, sharing) 
-checking for java in Boot JDK... ok
-checking for javac in Boot JDK... ok
-checking for javadoc in Boot JDK... ok
-checking for jar in Boot JDK... ok
-checking for jarsigner in Boot JDK... ok
-checking if Boot JDK is 32 or 64 bits... 64
-checking for local Boot JDK Class Data Sharing (CDS)... yes, created
-checking for jjs in Boot JDK... ok
-checking for Build JDK... yes, will use output dir
-checking if we should build headless-only (no GUI)... disabled, default
-checking if linker should clean out unused code (linktime-gc)... disabled, default
-checking for graphviz dot... no, cannot generate full docs
-checking for pandoc... no, cannot generate full docs
-checking for --enable-full-docs... disabled, from default 'auto'
-checking for cacerts file... default
-checking for --enable-unlimited-crypto... enabled, default
-checking for jni library path... default
-checking if static build is available... yes
-checking if static build is enabled... disabled, default
-configure: Xcode major version: 10
-configure: Using default toolchain clang (clang/LLVM)
-checking for clang... /usr/bin/clang
-checking resolved symbolic links for CC... no symlink
-configure: Using clang C compiler version 10.0.0 [Apple LLVM version 10.0.0 (clang-1000.11.45.5) Target: x86_64-apple-darwin19.5.0 Thread model: posix InstalledDir: /Applications/Xcode10.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-checking whether the C compiler works... yes
-checking for C compiler default output file name... a.out
-checking for suffix of executables... 
-checking whether we are cross compiling... no
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether /usr/bin/clang accepts -g... yes
-checking for /usr/bin/clang option to accept ISO C89... none needed
-checking for clang++... /usr/bin/clang++
-checking resolved symbolic links for CXX... no symlink
-configure: Using clang C++ compiler version 10.0.0 [Apple LLVM version 10.0.0 (clang-1000.11.45.5) Target: x86_64-apple-darwin19.5.0 Thread model: posix InstalledDir: /Applications/Xcode10.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-checking whether we are using the GNU C++ compiler... yes
-checking whether /usr/bin/clang++ accepts -g... yes
-checking how to run the C preprocessor... /usr/bin/clang -E
-checking how to run the C++ preprocessor... /usr/bin/clang++ -E
-checking for ld... ld
-configure: Rewriting LD_JAOTC to "/usr/bin/ld"
-configure: Using clang linker version 409.12 [@(#)PROGRAM:ld  PROJECT:ld64-409.12]
-checking for ar... ar
-configure: Rewriting AR to "/usr/bin/ar"
-checking for lipo... /usr/bin/lipo
-checking for otool... /usr/bin/otool
-checking for install_name_tool... /usr/bin/install_name_tool
-checking for strip... strip
-configure: Rewriting STRIP to "/usr/bin/strip"
-checking for nm... nm
-configure: Rewriting NM to "/usr/bin/nm"
-checking for gobjdump... no
-checking for objdump... objdump
-configure: Rewriting OBJDUMP to "/usr/bin/objdump"
-checking for c++filt... c++filt
-configure: Rewriting CXXFILT to "/usr/bin/c++filt"
-checking for jtreg... no
-checking for jtreg test harness... no, not found
-configure: error: --with-jtreg was specified, but no jtreg found.
+checking for version string... 15-internal+0-adhoc.ubuntu.hotspot
+configure: Found potential Boot JDK using JAVA_HOME
+gawk: cmd. line:1: warning: regexp escape sequence `\"' is not a known regexp operator
+configure: Potential Boot JDK found at /home/ubuntu/.sdkman/candidates/java/current is incorrect JDK version (openjdk version "19-ea" 2022-09-20); ignoring
+configure: (Your Boot JDK version must be one of: 14 15)
+checking for javac... /home/ubuntu/.sdkman/candidates/java/current/bin/javac
+checking for java... /home/ubuntu/.sdkman/candidates/java/current/bin/java
+configure: Found potential Boot JDK using java(c) in PATH
+gawk: cmd. line:1: warning: regexp escape sequence `\"' is not a known regexp operator
+configure: Potential Boot JDK found at /home/ubuntu/.sdkman/candidates/java/19.ea.19-open is incorrect JDK version (openjdk version "19-ea" 2022-09-20); ignoring
+configure: (Your Boot JDK version must be one of: 14 15)
+configure: Could not find a valid Boot JDK. OpenJDK distributions are available at http://jdk.java.net/.
+configure: This might be fixed by explicitly setting --with-boot-jdk
+configure: error: Cannot continue
